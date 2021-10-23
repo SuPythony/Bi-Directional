@@ -9,6 +9,37 @@ def check_collision(obj1, obj2):
     return obj1.mask.overlap(obj2.mask, (int(offset_x), int(offset_y))) is not None
 
 
+class Platform:
+    def __init__(self, surf):
+        self.surf = surf
+        self.images = []
+        self.images.append(
+            pygame.transform.scale(pygame.image.load(os.path.join("assets", "platforms", "PlatformBolts.png")),
+                                   (70, 70)))
+        self.images.append(
+            pygame.transform.scale(pygame.image.load(os.path.join("assets", "platforms", "PlatformBlank.png")),
+                                   (70, 70)))
+
+    def draw(self):
+        x = 0
+        img_index = 0
+        while x < self.surf.get_rect().w:
+            self.surf.blit(self.images[img_index],
+                           (x, self.surf.get_rect().h // 2 - self.images[img_index].get_rect().h))
+            x += self.images[img_index].get_rect().w
+            img_index += 1
+            if img_index > 1:
+                img_index = 0
+        x = 0
+        img_index = 0
+        while x < self.surf.get_rect().w:
+            self.surf.blit(self.images[img_index], (x, self.surf.get_rect().h - self.images[img_index].get_rect().h))
+            x += self.images[img_index].get_rect().w
+            img_index += 1
+            if img_index > 1:
+                img_index = 0
+
+
 class Bullet:
     def __init__(self, surf, remove_bullet):
         self.surf = surf
@@ -87,7 +118,7 @@ class Enemy:
         self.image = self.standing_images[self.standing_image_index]
         self.mask = pygame.mask.from_surface(self.image)
         self.x = self.surf.get_rect().w
-        self.y = 150 if self.lane == "left" else 350
+        self.y = 130 if self.lane == "left" else 430
         self.remove_enemy = remove_enemy
 
     def draw(self):
@@ -156,7 +187,7 @@ class Player:
         self.shooting = False
         self.dying = False
         self.bullets = []
-        self.y = 100 if self.direction == "left" else 300
+        self.y = 80 if self.direction == "left" else 380
         self.x = 0
 
     def draw(self, x):
@@ -230,6 +261,7 @@ class Game:
         self.enemy_speed = 5
         self.score_font = pygame.font.Font(os.path.join("assets", "fonts", "ka1.ttf"), 35)
         self.score = 0
+        self.platform = Platform(self.surf)
         self.increase_difficulty = pygame.USEREVENT + 2
         pygame.time.set_timer(self.increase_difficulty, 7500)
 
@@ -293,6 +325,7 @@ class Game:
             elif not enemy.biting and self.left_player.dying:
                 enemy.standing = True
             enemy.draw()
+        self.platform.draw()
 
         pygame.draw.rect(self.surf, "white", (0, self.surf.get_rect().h // 2, self.surf.get_rect().w, 3))
         if self.lane == "right":
