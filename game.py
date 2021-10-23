@@ -1,6 +1,7 @@
 import pygame
 import os
 import random
+import time
 
 
 def check_collision(obj1, obj2):
@@ -163,9 +164,10 @@ class Enemy:
 
 
 class Player:
-    def __init__(self, surf, direction):
+    def __init__(self, surf, direction, game_over):
         self.surf = surf
         self.direction = direction
+        self.game_over = game_over
         self.running_images = []
         self.standing_images = []
         self.shooting_images = []
@@ -212,8 +214,8 @@ class Player:
         if self.dying:
             self.dying_image_index += 1
             if self.dying_image_index > len(self.dying_images) - 1:
-                # player died game over
-                pass
+                pygame.time.delay(750)
+                self.game_over()
             else:
                 self.image = self.dying_images[self.dying_image_index]
         elif self.shooting:
@@ -257,14 +259,14 @@ class Player:
 
 
 class Game:
-    def __init__(self, surf, win_width, win_height, add_enemy_event):
+    def __init__(self, surf, win_width, win_height, add_enemy_event, show_game_over):
         self.surf = surf
         self.bg_img = pygame.transform.scale(pygame.image.load("assets/bg.png"), (win_width, win_height))
         self.win_width = win_width
         self.win_height = win_height
         self.player_x = 20
-        self.left_player = Player(self.surf, "left")
-        self.right_player = Player(self.surf, "right")
+        self.left_player = Player(self.surf, "left", show_game_over)
+        self.right_player = Player(self.surf, "right", show_game_over)
         self.player_width = self.left_player.image.get_rect().w
         self.player_height = self.left_player.image.get_rect().h
         self.player_speed = 10
