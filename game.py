@@ -1,7 +1,6 @@
 import pygame
 import os
 import random
-import time
 
 
 def check_collision(obj1, obj2):
@@ -385,7 +384,7 @@ class Game:
                         else:
                             self.right_player.shoot()
                             self.ammo -= 1
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.lane = "left" if self.lane == "right" else "right"
                 elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_a, pygame.K_d]:
                     self.left_player.moving = True

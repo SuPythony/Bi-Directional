@@ -24,6 +24,19 @@ class GameOver:
         self.restart_clicked = pygame.transform.scale(
             pygame.image.load(os.path.join("assets", "buttons", "restart_clicked.png")), (168, 120))
         self.restart_is_clicked = False
+        self.highscore = 0
+        self.new_highscore = True
+        with open(os.path.join("assets", "highscore.txt"), "r") as f:
+            data = f.read()
+            if data == "":
+                self.highscore = self.score
+                if self.score == 0:
+                    self.new_highscore = False
+            elif int(data) < self.score:
+                self.highscore = self.score
+            else:
+                self.new_highscore = False
+                self.highscore = int(data)
 
     def draw(self):
         self.surf.blit(self.bg_image, (0, 0))
@@ -34,22 +47,12 @@ class GameOver:
         self.surf.blit(text, ((self.surf.get_rect().w - text.get_rect().w) // 2, 20))
         text = self.score_font.render(f"Score: {self.score}", True, "white")
         self.surf.blit(text, ((self.surf.get_rect().w - text.get_rect().w) // 2, 170))
-        highscore = 0
-        new_highscore = True
-        with open(os.path.join("assets", "highscore.txt")) as f:
-            data = f.read()
-            if data == "":
-                highscore = self.score
-                if self.score == 0:
-                    new_highscore = False
-            elif int(data) < self.score:
-                highscore = self.score
-            else:
-                new_highscore = False
-                highscore = int(data)
-        text = self.high_score_font.render(f"High Score: {highscore}", True, "white")
+        if self.new_highscore:
+            with open(os.path.join("assets", "highscore.txt"), "w") as f:
+                f.write(str(self.score))
+        text = self.high_score_font.render(f"High Score: {self.highscore}", True, "white")
         self.surf.blit(text, ((self.surf.get_rect().w - text.get_rect().w) // 2, 270))
-        if new_highscore:
+        if self.new_highscore:
             text = self.new_high_score_font.render("New High Score!", True, "white")
             self.surf.blit(text, ((self.surf.get_rect().w - text.get_rect().w) // 2, 350))
         self.surf.blit(self.home if not self.home_is_clicked else self.home_clicked,

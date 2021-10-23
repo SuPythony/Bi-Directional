@@ -1,3 +1,9 @@
+import os
+import sys
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    os.chdir(sys._MEIPASS)
+
 import pygame
 from game import Game
 from game_over import GameOver
