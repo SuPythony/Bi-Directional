@@ -9,6 +9,23 @@ def check_collision(obj1, obj2):
     return obj1.mask.overlap(obj2.mask, (int(offset_x), int(offset_y))) is not None
 
 
+class AmmoIndicator:
+    def __init__(self, surf):
+        self.surf = surf
+        self.image = pygame.transform.scale(pygame.image.load(os.path.join("assets", "ammo", "indicator.png")),
+                                            (10, 28))
+
+    def draw(self, ammo):
+        x = 20
+        for i in range(ammo):
+            self.surf.blit(self.image, (x, 20))
+            if ammo <= 3:
+                red = pygame.Surface(self.image.get_rect().size).convert_alpha()
+                red.fill((255, 0, 0, 50))
+                self.surf.blit(red, (x, 20))
+            x += self.image.get_rect().w + 10
+
+
 class Platform:
     def __init__(self, surf):
         self.surf = surf
@@ -262,6 +279,8 @@ class Game:
         self.score_font = pygame.font.Font(os.path.join("assets", "fonts", "ka1.ttf"), 35)
         self.score = 0
         self.platform = Platform(self.surf)
+        self.ammo = 10
+        self.ammo_indicator = AmmoIndicator(self.surf)
         self.increase_difficulty = pygame.USEREVENT + 2
         pygame.time.set_timer(self.increase_difficulty, 7500)
 
@@ -306,6 +325,9 @@ class Game:
                         enemy.standing = False
                         enemy.moving = False
                         self.score += 1
+                        if self.score % 10 == 0:
+                            self.ammo += random.randint(3, 5)
+                        self.ammo += random.randint(0, 2)
         for bullet in self.right_player.bullets:
             for enemy in self.enemies:
                 if not enemy.dying:
@@ -315,6 +337,9 @@ class Game:
                         enemy.standing = False
                         enemy.moving = False
                         self.score += 1
+                        if self.score % 10 == 0:
+                            self.ammo += random.randint(3, 5)
+                        self.ammo += random.randint(0, 2)
         score_text = self.score_font.render(f"Score: {self.score}", True, "white")
         self.surf.blit(score_text, (self.surf.get_rect().w - 20 - score_text.get_rect().w, 20))
         self.left_player.draw(self.player_x)
@@ -326,6 +351,7 @@ class Game:
                 enemy.standing = True
             enemy.draw()
         self.platform.draw()
+        self.ammo_indicator.draw(self.ammo)
 
         pygame.draw.rect(self.surf, "white", (0, self.surf.get_rect().h // 2, self.surf.get_rect().w, 3))
         if self.lane == "right":
@@ -338,10 +364,13 @@ class Game:
         if not self.left_player.dying:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if self.lane == "left":
-                        self.left_player.shoot()
-                    else:
-                        self.right_player.shoot()
+                    if self.ammo > 0:
+                        if self.lane == "left":
+                            self.left_player.shoot()
+                            self.ammo -= 1
+                        else:
+                            self.right_player.shoot()
+                            self.ammo -= 1
                 elif event.key == pygame.K_UP:
                     self.lane = "left" if self.lane == "right" else "right"
                 elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_a, pygame.K_d]:
