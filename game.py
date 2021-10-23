@@ -214,7 +214,7 @@ class Player:
         if self.dying:
             self.dying_image_index += 1
             if self.dying_image_index > len(self.dying_images) - 1:
-                pygame.time.delay(750)
+                pygame.time.delay(500)
                 self.game_over()
             else:
                 self.image = self.dying_images[self.dying_image_index]
@@ -259,14 +259,16 @@ class Player:
 
 
 class Game:
-    def __init__(self, surf, win_width, win_height, add_enemy_event, show_game_over):
+    def __init__(self, surf, win_width, win_height, add_enemy_event, show_game_over, set_score):
         self.surf = surf
         self.bg_img = pygame.transform.scale(pygame.image.load("assets/bg.png"), (win_width, win_height))
         self.win_width = win_width
         self.win_height = win_height
+        self.set_score = set_score
+        self.show_game_over = show_game_over
         self.player_x = 20
-        self.left_player = Player(self.surf, "left", show_game_over)
-        self.right_player = Player(self.surf, "right", show_game_over)
+        self.left_player = Player(self.surf, "left", self.game_over)
+        self.right_player = Player(self.surf, "right", self.game_over)
         self.player_width = self.left_player.image.get_rect().w
         self.player_height = self.left_player.image.get_rect().h
         self.player_speed = 10
@@ -285,6 +287,10 @@ class Game:
         self.ammo_indicator = AmmoIndicator(self.surf)
         self.increase_difficulty = pygame.USEREVENT + 2
         pygame.time.set_timer(self.increase_difficulty, 7500)
+
+    def game_over(self):
+        self.set_score(self.score)
+        self.show_game_over()
 
     def remove_enemy(self, enemy):
         temp_enemies = self.enemies
@@ -329,7 +335,10 @@ class Game:
                         self.score += 1
                         if self.score % 10 == 0:
                             self.ammo += random.randint(3, 5)
-                        self.ammo += random.randint(0, 2)
+                        if self.ammo <= 5:
+                            self.ammo += random.randint(1, 2)
+                        if self.ammo > 20:
+                            self.ammo = 20
         for bullet in self.right_player.bullets:
             for enemy in self.enemies:
                 if not enemy.dying:
@@ -341,7 +350,10 @@ class Game:
                         self.score += 1
                         if self.score % 10 == 0:
                             self.ammo += random.randint(3, 5)
-                        self.ammo += random.randint(0, 2)
+                        if self.ammo <= 5:
+                            self.ammo += random.randint(1, 2)
+                        if self.ammo > 20:
+                            self.ammo = 20
         score_text = self.score_font.render(f"Score: {self.score}", True, "white")
         self.surf.blit(score_text, (self.surf.get_rect().w - 20 - score_text.get_rect().w, 20))
         self.left_player.draw(self.player_x)
