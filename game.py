@@ -6,7 +6,7 @@ import random
 def check_collision(obj1, obj2):
     offset_x = obj2.x - obj1.x
     offset_y = obj2.y - obj1.y
-    return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) is not None
+    return obj1.mask.overlap(obj2.mask, (int(offset_x), int(offset_y))) is not None
 
 
 class Bullet:
@@ -112,9 +112,6 @@ class Enemy:
             self.image = self.dying_images[self.dying_image_index]
         self.mask = pygame.mask.from_surface(self.image)
         self.surf.blit(self.image, (self.x, self.y))
-
-    def move(self):
-        self.x -= 5
 
 
 class Player:
@@ -230,8 +227,11 @@ class Game:
         self.add_enemy_event = add_enemy_event
         self.added_first_enemy = False
         self.enemy_spawn_time = 3500
+        self.enemy_speed = 5
         self.score_font = pygame.font.Font(os.path.join("assets", "fonts", "ka1.ttf"), 35)
         self.score = 0
+        self.increase_difficulty = pygame.USEREVENT + 2
+        pygame.time.set_timer(self.increase_difficulty, 7500)
 
     def remove_enemy(self, enemy):
         temp_enemies = self.enemies
@@ -289,7 +289,7 @@ class Game:
         self.right_player.draw(self.player_x)
         for enemy in self.enemies:
             if not enemy.dying and not enemy.biting and not self.left_player.dying:
-                enemy.move()
+                enemy.x -= self.enemy_speed
             elif not enemy.biting and self.left_player.dying:
                 enemy.standing = True
             enemy.draw()
@@ -335,3 +335,6 @@ class Game:
                     self.added_first_enemy = True
                 pygame.time.set_timer(self.add_enemy_event, self.enemy_spawn_time)
                 self.enemies.append(Enemy(self.surf, self.remove_enemy))
+            elif event.type == self.increase_difficulty:
+                self.enemy_speed += 1.5
+                self.enemy_spawn_time -= 250
