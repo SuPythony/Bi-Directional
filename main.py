@@ -21,7 +21,7 @@ HEIGHT = 600
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
 pygame.display.set_caption("BYOG 2021 Game")
-pygame.display.set_icon(pygame.image.load(os.path.join("assets", "icon.png")))
+pygame.display.set_icon(pygame.image.load(os.path.join("assets", "icon.ico")))
 
 game = None
 game_over = None
