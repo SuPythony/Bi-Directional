@@ -9,6 +9,7 @@ from game import Game
 from game_over import GameOver
 from home_screen import HomeScreen
 from instructions import Instructions
+from credits import Credits
 
 pygame.init()
 pygame.font.init()
@@ -26,6 +27,7 @@ game = None
 game_over = None
 home_screen = None
 instructions = None
+game_credits = None
 
 score = 0
 
@@ -46,15 +48,18 @@ def redraw_screen():
         home_screen.draw()
     if instructions:
         instructions.draw()
+    if game_credits:
+        game_credits.draw()
     pygame.display.flip()
 
 
 def start_game():
-    global game, home_screen, game_over, instructions
+    global game, home_screen, game_over, instructions, game_credits
 
     home_screen = None
     game_over = None
     instructions = None
+    game_credits = None
 
     ADD_ENEMY = pygame.USEREVENT + 1
     pygame.time.set_timer(ADD_ENEMY, 1500, 1)
@@ -65,27 +70,29 @@ def start_game():
 
 
 def show_game_over():
-    global game, home_screen, game_over, instructions
+    global game, home_screen, game_over, instructions, game_credits
 
     home_screen = None
     game = None
     instructions = None
+    game_credits = None
 
     game_over = GameOver(WIN, score, show_home_screen, start_game)
 
 
 def show_home_screen():
-    global game, home_screen, game_over, instructions
+    global game, home_screen, game_over, instructions, game_credits
 
     game = None
     game_over = None
-    if instructions is None:
+    if instructions is None and game_credits is None:
         play = True
     else:
         play = False
     instructions = None
+    game_credits = None
 
-    home_screen = HomeScreen(WIN, start_game, show_instructions)
+    home_screen = HomeScreen(WIN, start_game, show_instructions, show_credits)
     if play:
         pygame.mixer.music.load(os.path.join("assets", "sounds", "background_music.mp3"))
         pygame.mixer.music.play(-1)
@@ -93,13 +100,25 @@ def show_home_screen():
 
 
 def show_instructions():
-    global game, home_screen, game_over, instructions
+    global game, home_screen, game_over, instructions, game_credits
 
     game = None
     game_over = None
     home_screen = None
+    game_credits = None
 
     instructions = Instructions(WIN, show_home_screen)
+
+
+def show_credits():
+    global game, home_screen, game_over, instructions, game_credits
+
+    game = None
+    game_over = None
+    home_screen = None
+    instructions = None
+
+    game_credits = Credits(WIN, show_home_screen)
 
 
 def main():
@@ -118,6 +137,8 @@ def main():
                 game_over.on_event(event)
             if instructions:
                 instructions.on_event(event)
+            if game_credits:
+                game_credits.on_event(event)
         redraw_screen()
         clock.tick(15)
     pygame.quit()
