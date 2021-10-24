@@ -254,11 +254,12 @@ class Player:
         temp_bullets.remove(bullet)
         self.bullets = temp_bullets
 
-    def shoot(self):
+    def shoot(self, shoot_bullet):
         bullet = Bullet(self.surf, self.remove_bullet)
-        self.bullets.append(bullet)
         self.shooting = True
-        self.bullet_fire.play()
+        if shoot_bullet:
+            self.bullets.append(bullet)
+            self.bullet_fire.play()
 
 
 class Game:
@@ -388,18 +389,22 @@ class Game:
                     if self.score >= 30:
                         if self.ammo > 0:
                             if self.lane == "left":
-                                self.right_player.shoot()
+                                self.right_player.shoot(True)
+                                self.left_player.shoot(False)
                                 self.ammo -= 2
                             else:
-                                self.left_player.shoot()
+                                self.left_player.shoot(True)
+                                self.right_player.shoot(False)
                                 self.ammo -= 2
                 elif event.key == pygame.K_SPACE:
                     if self.ammo > 0:
                         if self.lane == "left":
-                            self.left_player.shoot()
+                            self.left_player.shoot(True)
+                            self.right_player.shoot(False)
                             self.ammo -= 1
                         else:
-                            self.right_player.shoot()
+                            self.right_player.shoot(True)
+                            self.left_player.shoot(False)
                             self.ammo -= 1
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.lane = "left" if self.lane == "right" else "right"
