@@ -15,7 +15,7 @@ class Credits:
             "Made for BYOG 2021 Game Jam",
             "",
             "Programmed by Sumanyu Aggarwal",
-            "Art created and edited by ",
+            "Art created and edited by Amr Al-Khwlani",
             "Music given by Tejas Chichkar",
             "",
             "Additional credits in credits.txt",
