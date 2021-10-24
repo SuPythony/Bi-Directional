@@ -72,14 +72,9 @@ class GameOver:
                 self.restart_is_clicked = True
         elif event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
-            if pygame.Rect(((self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460,
-                            self.home.get_rect().w, self.home.get_rect().h)).collidepoint(x, y):
-                if self.home_is_clicked:
-                    self.home_is_clicked = False
-                    self.goto_home()
-            elif pygame.Rect((
-                    self.surf.get_rect().w // 2 + (self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460,
-                    self.restart.get_rect().w, self.restart.get_rect().h)).collidepoint(x, y):
-                if self.restart_is_clicked:
-                    self.restart_is_clicked = False
-                    self.restart_game()
+            if self.home_is_clicked:
+                self.home_is_clicked = False
+                self.goto_home()
+            elif self.restart_is_clicked:
+                self.restart_is_clicked = False
+                self.restart_game()

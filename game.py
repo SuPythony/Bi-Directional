@@ -207,12 +207,15 @@ class Player:
         self.bullets = []
         self.y = 80 if self.direction == "left" else 380
         self.x = 0
+        self.bullet_fire = pygame.mixer.Sound(os.path.join("assets", "sounds", "bullet_fire.mp3"))
 
     def draw(self, x):
         self.x = x
         if self.dying:
             self.dying_image_index += 1
             if self.dying_image_index > len(self.dying_images) - 1:
+                pygame.mixer.music.stop()
+                pygame.mixer.Sound(os.path.join("assets", "sounds", "game_over.mp3")).play(0)
                 pygame.time.delay(500)
                 self.game_over()
             else:
@@ -255,16 +258,18 @@ class Player:
         bullet = Bullet(self.surf, self.remove_bullet)
         self.bullets.append(bullet)
         self.shooting = True
+        self.bullet_fire.play()
 
 
 class Game:
-    def __init__(self, surf, win_width, win_height, add_enemy_event, show_game_over, set_score):
+    def __init__(self, surf, win_width, win_height, add_enemy_event, show_game_over, set_score, goto_home_screen):
         self.surf = surf
         self.bg_img = pygame.transform.scale(pygame.image.load("assets/bg.png"), (win_width, win_height))
         self.win_width = win_width
         self.win_height = win_height
         self.set_score = set_score
         self.show_game_over = show_game_over
+        self.goto_home_screen = goto_home_screen
         self.player_x = 20
         self.left_player = Player(self.surf, "left", self.game_over)
         self.right_player = Player(self.surf, "right", self.game_over)
@@ -318,6 +323,7 @@ class Game:
                 self.right_player.moving = False
                 self.right_player.standing = True
         self.surf.blit(self.bg_img, (0, 0))
+        self.surf.blit(self.bg_img, (0, self.surf.get_rect().h // 2))
         for enemy in self.enemies:
             if check_collision(enemy, self.left_player) or check_collision(enemy, self.right_player):
                 self.left_player.dying = True
@@ -376,7 +382,18 @@ class Game:
     def on_event(self, event):
         if not self.left_player.dying:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_ESCAPE:
+                    self.goto_home_screen()
+                elif event.key == pygame.K_x:
+                    if self.score >= 30:
+                        if self.ammo > 0:
+                            if self.lane == "left":
+                                self.right_player.shoot()
+                                self.ammo -= 2
+                            else:
+                                self.left_player.shoot()
+                                self.ammo -= 2
+                elif event.key == pygame.K_SPACE:
                     if self.ammo > 0:
                         if self.lane == "left":
                             self.left_player.shoot()

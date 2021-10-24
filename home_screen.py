@@ -3,9 +3,10 @@ import os
 
 
 class HomeScreen:
-    def __init__(self, surf, start_game):
+    def __init__(self, surf, start_game, show_instructions):
         self.surf = surf
         self.start_game = start_game
+        self.show_instructions = show_instructions
         self.bg = pygame.image.load(os.path.join("assets", "menu_bg.png"))
         self.play = pygame.transform.scale(pygame.image.load(os.path.join("assets", "buttons", "play.png")), (240, 80))
         self.instructions = pygame.transform.scale(
@@ -35,12 +36,9 @@ class HomeScreen:
                 self.instructions_is_clicked = True
         elif event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
-            if pygame.Rect(((self.surf.get_rect().w - self.play.get_rect().w) // 2, self.surf.get_rect().h // 2 - 30,
-                            self.play.get_rect().w, self.play.get_rect().h)).collidepoint(x, y):
-                if self.play_is_clicked:
-                    self.play_is_clicked = False
-                    self.start_game()
-            elif pygame.Rect(((self.surf.get_rect().w - self.play.get_rect().w) // 2, self.surf.get_rect().h // 2 + 80,
-                              self.play.get_rect().w, self.play.get_rect().h)).collidepoint(x, y):
-                if self.instructions_is_clicked:
-                    self.instructions_is_clicked = False
+            if self.play_is_clicked:
+                self.play_is_clicked = False
+                self.start_game()
+            elif self.instructions_is_clicked:
+                self.instructions_is_clicked = False
+                self.show_instructions()
