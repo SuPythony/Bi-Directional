@@ -32,7 +32,8 @@ class Instructions:
             "",
             "You need to kill and overcome all",
             "the enemies to reach to the control room,",
-            "but the enemies just keep coming, more and more.",
+            "but the enemies just keep coming,",
+            "more and more.",
             "",
             "Try to kill as many enemies as you can and",
             "break your highscore!"
@@ -84,7 +85,11 @@ class Instructions:
             "Now you are ready to go! colorb",
             "",
             "Kill the aliens, don't die and",
-            "try to break your high score!"
+            "try to break your high score!",
+            "",
+            "Remember - the game becomes",
+            "progressively difficult as",
+            "you score."
         ]
         self.pages = [page1, page2, page3, page4, page5, page6, page7]
         self.y = 80
