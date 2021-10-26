@@ -154,6 +154,8 @@ class Game:
                             self.ammo -= 1
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.lane = "left" if self.lane == "right" else "right"
+                    self.left_player.lane_changed(self.lane)
+                    self.right_player.lane_changed(self.lane)
                 elif event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_a, pygame.K_d]:
                     self.left_player.moving = True
                     self.left_player.standing = False
