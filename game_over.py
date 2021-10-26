@@ -1,5 +1,6 @@
 import pygame
 import os
+from button import Button
 
 
 class GameOver:
@@ -15,15 +16,16 @@ class GameOver:
         self.high_score_font = pygame.font.Font(os.path.join("assets", "fonts", "8BitOperatorPlus-Bold.ttf"), 60)
         self.new_high_score_font = pygame.font.Font(os.path.join("assets", "fonts", "8BitOperatorPlus-Bold.ttf"), 50)
 
-        self.home = pygame.transform.scale(pygame.image.load(os.path.join("assets", "buttons", "home.png")), (168, 120))
-        self.home_clicked = pygame.transform.scale(
-            pygame.image.load(os.path.join("assets", "buttons", "home_clicked.png")), (168, 120))
-        self.home_is_clicked = False
-        self.restart = pygame.transform.scale(pygame.image.load(os.path.join("assets", "buttons", "restart.png")),
-                                              (168, 120))
-        self.restart_clicked = pygame.transform.scale(
-            pygame.image.load(os.path.join("assets", "buttons", "restart_clicked.png")), (168, 120))
-        self.restart_is_clicked = False
+        self.home_button = Button(self.surf, os.path.join("assets", "buttons", "home.png"),
+                                  os.path.join("assets", "buttons", "home_clicked.png"), (168, 120), "Home",
+                                  self.goto_home)
+        self.home_button.button_pos = ((self.surf.get_rect().w // 2 - self.home_button.normal.get_rect().w) // 2, 460)
+        self.restart_button = Button(self.surf, os.path.join("assets", "buttons", "restart.png"),
+                                     os.path.join("assets", "buttons", "restart_clicked.png"), (168, 120), "Restart",
+                                     self.restart_game)
+        self.restart_button.button_pos = (
+            self.surf.get_rect().w // 2 + (self.surf.get_rect().w // 2 - self.home_button.normal.get_rect().w) // 2,
+            460)
         self.highscore = 0
         self.new_highscore = True
         with open(os.path.join("assets", "highscore.txt"), "r") as f:
@@ -55,26 +57,10 @@ class GameOver:
         if self.new_highscore:
             text = self.new_high_score_font.render("New High Score!", True, "white")
             self.surf.blit(text, ((self.surf.get_rect().w - text.get_rect().w) // 2, 350))
-        self.surf.blit(self.home if not self.home_is_clicked else self.home_clicked,
-                       ((self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460))
-        self.surf.blit(self.restart if not self.restart_is_clicked else self.restart_clicked, (
-            self.surf.get_rect().w // 2 + (self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460))
+        self.home_button.draw()
+        self.restart_button.draw()
 
     def on_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if pygame.Rect(((self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460,
-                            self.home.get_rect().w, self.home.get_rect().h)).collidepoint(x, y):
-                self.home_is_clicked = True
-            elif pygame.Rect((
-                    self.surf.get_rect().w // 2 + (self.surf.get_rect().w // 2 - self.home.get_rect().w) // 2, 460,
-                    self.restart.get_rect().w, self.restart.get_rect().h)).collidepoint(x, y):
-                self.restart_is_clicked = True
-        elif event.type == pygame.MOUSEBUTTONUP:
-            x, y = event.pos
-            if self.home_is_clicked:
-                self.home_is_clicked = False
-                self.goto_home()
-            elif self.restart_is_clicked:
-                self.restart_is_clicked = False
-                self.restart_game()
+        if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION:
+            self.home_button.on_event(event)
+            self.restart_button.on_event(event)

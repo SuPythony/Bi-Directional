@@ -1,6 +1,6 @@
 import os
-
 import pygame
+from button import Button
 
 
 class Instructions:
@@ -11,10 +11,10 @@ class Instructions:
         self.font = pygame.font.Font(os.path.join("assets", "fonts", "8BitOperatorPlus-Bold.ttf"), 30)
         self.heading_font = pygame.font.Font(os.path.join("assets", "fonts", "8BitOperatorPlus-Bold.ttf"), 50)
         self.instruct_font = pygame.font.Font(os.path.join("assets", "fonts", "8BitOperatorPlus-Bold.ttf"), 15)
-        self.quit = pygame.transform.scale(pygame.image.load(os.path.join("assets", "buttons", "quit.png")), (150, 50))
-        self.quit_clicked = pygame.transform.scale(
-            pygame.image.load(os.path.join("assets", "buttons", "quit_clicked.png")), (150, 50))
-        self.quit_is_clicked = False
+        self.quit_button = Button(self.surf, os.path.join("assets", "buttons", "quit.png"),
+                                  os.path.join("assets", "buttons", "quit_clicked.png"), (150, 50), "Close",
+                                  self.go_back)
+        self.quit_button.button_pos = (self.surf.get_rect().w - self.quit_button.normal.get_rect().w - 20, 20)
         page1 = [
             "Welcome to Bi-Directional, a multiview",
             "2d shooter game!",
@@ -98,8 +98,7 @@ class Instructions:
 
     def draw(self):
         self.surf.blit(self.bg, (0, 0))
-        self.surf.blit(self.quit if not self.quit_is_clicked else self.quit_clicked,
-                       (self.surf.get_rect().w - self.quit.get_rect().w - 20, 20))
+        self.quit_button.draw()
         if not self.key_used:
             self.surf.blit(self.instruct_font.render("Use arrow keys to change the page", True, "white"), (20, 30))
         text = self.font.render(f"{self.page} of {len(self.pages)}", True, "white")
@@ -116,7 +115,9 @@ class Instructions:
 
     def on_event(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
+            if event.key == pygame.K_ESCAPE:
+                self.go_back()
+            elif event.key == pygame.K_RIGHT:
                 self.key_used = True
                 self.page += 1
                 if self.page > len(self.pages):
@@ -126,13 +127,5 @@ class Instructions:
                 self.page -= 1
                 if self.page < 1:
                     self.page = 1
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if pygame.Rect(self.surf.get_rect().w - self.quit.get_rect().w - 20, 20, self.quit.get_rect().w,
-                           self.quit.get_rect().h).collidepoint(x, y):
-                self.quit_is_clicked = True
-        elif event.type == pygame.MOUSEBUTTONUP:
-            x, y = event.pos
-            if self.quit_is_clicked:
-                self.quit_is_clicked = False
-                self.go_back()
+        elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEBUTTONUP or event.type == pygame.MOUSEMOTION:
+            self.quit_button.on_event(event)
